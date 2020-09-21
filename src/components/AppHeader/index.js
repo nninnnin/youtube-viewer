@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import logo from "../../assets/logo.svg";
 import SearchInput from "../SearchInput";
 import Container from "../shared/Container";
 import Heading from "../shared/Heading";
+import { searchYoutube } from '../../api/youtube';
 
 const Header = styled.header`
   position: fixed;
@@ -27,7 +28,6 @@ const Header = styled.header`
     h1 {
       margin-left: 10px;
       text-transform: uppercase;
-      font-style: italic;
     }
   }
 
@@ -37,25 +37,43 @@ const Header = styled.header`
 
   .input-container {
     width: 300px;
+    display: flex;
+    white-space: nowrap;
   }
 `;
 
-export default function AppHeader() {
+export default function AppHeader({ updateSearchingResult }) {
+  const [searchInput, setSearchInput] = useState('');
+
+  async function handleSearchButtonClick () {
+    console.log(searchInput);
+    const searchKeys = {
+      q: searchInput,
+      maxResults: 10,
+      type: "video"
+    };
+    const result = await searchYoutube(searchKeys);
+    console.log(result);
+    updateSearchingResult(result.items);
+  }
+
   return (
     <Header>
       <Container>
         <section>
           <div className="brand">
             <img src={logo} alt="logo" />
-            <Heading>Youtube Viewer</Heading>
+            <Heading>VANILLA TUBE</Heading>
           </div>
           <div className="input-container">
             <SearchInput
               placeholder="Youtube 검색"
-              onChange={(searchKeyword) => {
-                console.log(searchKeyword);
+              value={searchInput}
+              onChange={(val) => {
+                setSearchInput(val);
               }}
             />
+            <button onClick={handleSearchButtonClick}>찾기</button>
           </div>
         </section>
       </Container>

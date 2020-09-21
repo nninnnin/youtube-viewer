@@ -12,26 +12,15 @@ const Wrapper = styled.div`
   row-gap: 20px;
 `;
 
-export default function VideoList() {
+export default function VideoList({ videoListData }) {
+  console.log(videoListData);
+  const videoList = videoListData.map((video) => {
+    return <VideoListEntry videoData={video} key={video.etag} />
+  });
+
   return (
     <Wrapper>
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
-      <VideoListEntry />
+      {videoList}
     </Wrapper>
   );
 }
