@@ -6,7 +6,7 @@ import Container from "../shared/Container";
 import { searchYoutube } from '../../api/youtube';
 
 const Main = styled.main`
-  margin-top: 110px;
+  margin: 110px 0;
 `;
 
 export default function App() {
