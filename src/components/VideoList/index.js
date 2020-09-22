@@ -19,7 +19,7 @@ export default function VideoList({ videoListData }) {
   });
 
   return (
-    <Wrapper>
+    <Wrapper className="video-list-wrapper">
       {videoList}
     </Wrapper>
   );
