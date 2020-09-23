@@ -11,6 +11,7 @@ const Header = styled.header`
   background-color: #ffffff;
   width: 100%;
   top: 0;
+  z-index: 5;
   box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.1);
 
   section {

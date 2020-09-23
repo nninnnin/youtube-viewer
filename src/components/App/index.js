@@ -1,46 +1,37 @@
 import React, { useState, useEffect } from "react";
 import _ from "lodash";
-import VideoList from "../VideoList";
+import {
+  BrowserRouter as Router,
+  Route
+} from "react-router-dom";
+
 import AppHeader from "../AppHeader";
-import styled from "styled-components";
+import VideoList from "../VideoList";
+import VideoPlayer from "../VideoPlayer";
+import styled, { createGlobalStyle } from "styled-components";
 import Container from "../shared/Container";
 import { searchYoutube } from '../../api/youtube';
-
-const Main = styled.main`
-  margin: 110px 0;
-`;
 
 const UTILITY_VARIABLES = {
   nextPageToken: '',
   scrollableHeight: -Infinity
 };
 
+const Main = styled.main`
+  margin: 110px 0;
+`;
+
+
 export default function App() {
   const [ searchingResult, setSearchingResult ] = useState([]);
   const [ renderedVideoCounter, setRenderedVideoCounter ] = useState(0);
+  const [ selectedVideo, setSelectedVideo ] = useState({});
 
-  const debouncedFetchingNewData = _.debounce(fetchingNewData, 2000, {'leading': true, 'trailing': false});
-
-  async function fetchingNewData(nextPageToken) {
-    console.log('펫칭');
-    console.log(searchingResult);
-    try {
-      const result = await searchYoutube({
-        maxResults: 10,
-        pageToken: nextPageToken
-      });
-      setSearchingResult(searchingResult.concat(result.items));
-      UTILITY_VARIABLES.nextPageToken = result.nextPageToken;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const handleScrolling = (e) => {
-    if (window.scrollY >= UTILITY_VARIABLES.scrollableHeight - 50) {
-      debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken);
-    }
-  };
+  const GlobalStyle = createGlobalStyle`
+      body {
+        ${selectedVideo.id ? 'height: 100vh; overflow-y: hidden;' : ''}
+      }
+  `;
 
   useEffect(() => {
     fetchingNewData('');
@@ -70,18 +61,56 @@ export default function App() {
     window.addEventListener('scroll', handleScrolling);
 
     return () => {
-      window.removeEventListener('scroll', handleScrolling);
+      window.removeEventListener('scroll', handleScrolling); // 얘가 없애주는건 어떤 이벤트 리스너일까?
     }
   }, [renderedVideoCounter]);
 
+  const handleScrolling = (e) => {
+    if (window.scrollY >= UTILITY_VARIABLES.scrollableHeight - 50) {
+      debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken);
+    }
+  };
+
+  const debouncedFetchingNewData = _.debounce(fetchingNewData, 2000, {'leading': true, 'trailing': false});
+
+  async function fetchingNewData(nextPageToken) {
+    console.log('펫칭');
+    console.log(searchingResult);
+    try {
+      const result = await searchYoutube({
+        maxResults: 10,
+        pageToken: nextPageToken
+      });
+      setSearchingResult(searchingResult.concat(result.items));
+      UTILITY_VARIABLES.nextPageToken = result.nextPageToken;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const findVideo = (videoId) => {
+    for (let i = 0; i < searchingResult.length; i++) {
+      if (searchingResult[i].id.videoId === videoId) {
+        setSelectedVideo(searchingResult[i]);
+        break;
+      }
+    }
+  }
+
   return (
-    <>
+    <Router>
+      <GlobalStyle />
       <AppHeader updateSearchingResult={(val) => setSearchingResult(val)} />
-      <Main>
-        <Container>
-          <VideoList videoListData={searchingResult} />
-        </Container>
-      </Main>
-    </>
+      <Route path="/">
+        <Main>
+          <Container>
+              <VideoList videoListData={searchingResult} />
+          </Container>
+        </Main>
+      </Route>
+      <Route path="/:videoId" >
+        {renderedVideoCounter > 0 && <VideoPlayer onMount={findVideo} videoData={selectedVideo} />}
+      </Route>
+    </Router>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const EntryWrapper = styled.div`
@@ -9,6 +10,7 @@ const EntryWrapper = styled.div`
   height: auto;
   display: flex;
   flex-direction: column;
+  transition: 0.2s;
 
   padding: 10px;
   box-shadow: 1px 1px 4px black;
@@ -18,6 +20,8 @@ const EntryWrapper = styled.div`
     width: 100%;
     border-radius: 10px;
     margin-bottom: 10px;
+
+    cursor: pointer;
   }
 
   .contents {
@@ -31,13 +35,17 @@ const EntryWrapper = styled.div`
   .publishTime {
     font-weight: bold;
   }
+
+  :hover{
+    transform: scale(1.05);
+  }
 `;
 
 export default function VideoListEntry({ videoData }) {
   return (
     <EntryWrapper>
       <div>
-        <img src={videoData.snippet.thumbnails.high.url} alt="" />
+        <Link to={`/${videoData.id.videoId}`}><img src={videoData.snippet.thumbnails.high.url}/></Link>
       </div>
       <div className="contents">
         <div className="title">{videoData.snippet.title}</div>
