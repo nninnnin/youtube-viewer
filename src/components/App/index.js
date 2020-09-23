@@ -10,15 +10,43 @@ const Main = styled.main`
   margin: 110px 0;
 `;
 
-let scrollableHeight = -Infinity; // 이게 여기있는게 옳은걸까?
-let nextPageToken = '';
+const UTILITY_VARIABLES = {
+  nextPageToken: '',
+  scrollableHeight: -Infinity
+};
 
 export default function App() {
   const [ searchingResult, setSearchingResult ] = useState([]);
   const [ renderedVideoCounter, setRenderedVideoCounter ] = useState(0);
 
+  const debouncedFetchingNewData = _.debounce(fetchingNewData, 2000, {'leading': true, 'trailing': false});
+
+  async function fetchingNewData(nextPageToken) {
+    console.log('펫칭');
+    console.log(searchingResult);
+    try {
+      const result = await searchYoutube({
+        maxResults: 10,
+        pageToken: nextPageToken
+      });
+      setSearchingResult(searchingResult.concat(result.items));
+      UTILITY_VARIABLES.nextPageToken = result.nextPageToken;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleScrolling = (e) => {
+    if (window.scrollY >= UTILITY_VARIABLES.scrollableHeight - 50) {
+      debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken);
+    }
+  };
+
   useEffect(() => {
-    // 매번 리렌더링 때 마다 렌더링 된 비디오의 갯수를 업데이트한다
+    fetchingNewData('');
+  }, []);
+
+  useEffect(() => {
     const renderedVideo = document.getElementsByClassName('video-list-wrapper')[0].children;
 
     if (renderedVideoCounter !== renderedVideo.length) {
@@ -28,6 +56,7 @@ export default function App() {
   });
 
   useEffect(() => {
+    // 비디오가 렌더링 될 때 마다 제한선 새로고침
     const main = document.getElementsByTagName('main')[0];
 
     let mainElementMargin = 0;
@@ -35,43 +64,15 @@ export default function App() {
     mainElementMargin += parseInt(window.getComputedStyle(main).getPropertyValue('margin-bottom'));
 
     const viewerHeight = window.innerHeight;
-    scrollableHeight = main.offsetHeight + mainElementMargin - viewerHeight;
+    UTILITY_VARIABLES.scrollableHeight = main.offsetHeight + mainElementMargin - viewerHeight;
 
-    console.log(scrollableHeight);
-  }, [renderedVideoCounter]);
+    // 비디오가 렌더링 될 때 마다 window에 걸린 이벤트리스너를 새고로침 (새로운 디바운스 함수를 실행)
+    window.addEventListener('scroll', handleScrolling);
 
-  useEffect(() => {
-    window.addEventListener('scroll', (e) => {
-      console.log(window.scrollY);
-      console.log(scrollableHeight);
-
-      // scrollable 의 80%보다 scrollY가 크다면 새로운 데이터 펫칭 실행하기
-      if (window.scrollY >= scrollableHeight * 0.8) {
-        console.log('지금이야!!');
-
-        const debouncedFetchingNewData = _.debounce(fetchingNewData, 1000, {leading: true});
-        // 내가 원하는건 fetchingNewData가 처음 한번만 실행되는 거
-        // leading과 trailing 옵션으로 조절할 수 있을 것 같다
-        // https://medium.com/@ellenaua/throttle-debounce-behavior-lodash-6bcae1494e03
-      }
-    });
-
-    async function fetchingNewData (nextPageToken) {
-      try {
-        const result = await searchYoutube({
-          maxResults: 10,
-          nextPageToken
-        });
-        console.log(result);
-        setSearchingResult(result.items);
-        nextPageToken = result.nextPageToken;
-      } catch (err) {
-        console.log(err);
-      }
+    return () => {
+      window.removeEventListener('scroll', handleScrolling);
     }
-
-    fetchingNewData(10);
-  }, []);
+  }, [renderedVideoCounter]);
 
   return (
     <>
