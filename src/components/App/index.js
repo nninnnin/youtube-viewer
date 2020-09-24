@@ -14,24 +14,18 @@ import { searchYoutube } from '../../api/youtube';
 
 const UTILITY_VARIABLES = {
   nextPageToken: '',
-  scrollableHeight: -Infinity
+  scrollableHeight: -Infinity,
+  latestSearchedKeyword: ''
 };
 
 const Main = styled.main`
   margin: 110px 0;
 `;
 
-
 export default function App() {
   const [ searchingResult, setSearchingResult ] = useState([]);
   const [ renderedVideoCounter, setRenderedVideoCounter ] = useState(0);
   const [ selectedVideo, setSelectedVideo ] = useState({});
-
-  const GlobalStyle = createGlobalStyle`
-      body {
-        ${selectedVideo.id ? 'height: 100vh; overflow-y: hidden;' : ''}
-      }
-  `;
 
   useEffect(() => {
     fetchingNewData('');
@@ -47,7 +41,22 @@ export default function App() {
   });
 
   useEffect(() => {
-    // 비디오가 렌더링 될 때 마다 제한선 새로고침
+    window.addEventListener('scroll', handleScrolling);
+
+    return () => {
+      window.removeEventListener('scroll', handleScrolling);
+    }
+  }, [renderedVideoCounter]);
+
+  const handleScrolling = (e) => {
+    if (shouldFetchNewData()) {
+      debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken, UTILITY_VARIABLES.latestSearchedKeyword);
+    }
+  };
+
+  function shouldFetchNewData () {
+    const currentPosition = window.scrollY;
+
     const main = document.getElementsByTagName('main')[0];
 
     let mainElementMargin = 0;
@@ -55,34 +64,34 @@ export default function App() {
     mainElementMargin += parseInt(window.getComputedStyle(main).getPropertyValue('margin-bottom'));
 
     const viewerHeight = window.innerHeight;
-    UTILITY_VARIABLES.scrollableHeight = main.offsetHeight + mainElementMargin - viewerHeight;
+    const finiteLine = main.offsetHeight + mainElementMargin - viewerHeight - 50;
 
-    // 비디오가 렌더링 될 때 마다 window에 걸린 이벤트리스너를 새고로침 (새로운 디바운스 함수를 실행)
-    window.addEventListener('scroll', handleScrolling);
+    console.log(currentPosition, finiteLine);
 
-    return () => {
-      window.removeEventListener('scroll', handleScrolling); // 얘가 없애주는건 어떤 이벤트 리스너일까?
-    }
-  }, [renderedVideoCounter]);
-
-  const handleScrolling = (e) => {
-    if (window.scrollY >= UTILITY_VARIABLES.scrollableHeight - 50) {
-      debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken);
-    }
-  };
+    return Boolean(finiteLine - currentPosition <= 0);
+  }
 
   const debouncedFetchingNewData = _.debounce(fetchingNewData, 2000, {'leading': true, 'trailing': false});
+  const debouncedFetchingNewData_trailing = _.debounce(fetchingNewData, 2000, {'leading': false, 'trailing': true});
 
-  async function fetchingNewData(nextPageToken) {
+  async function fetchingNewData(nextPageToken, keyword='') {
     console.log('펫칭');
-    console.log(searchingResult);
     try {
       const result = await searchYoutube({
+        q: keyword,
         maxResults: 10,
-        pageToken: nextPageToken
+        pageToken: nextPageToken,
+        type: "video"
       });
-      setSearchingResult(searchingResult.concat(result.items));
+
+      if (keyword !== UTILITY_VARIABLES.latestSearchedKeyword) {
+        setSearchingResult(result.items);
+      } else {
+        setSearchingResult(searchingResult.concat(result.items));
+      }
+
       UTILITY_VARIABLES.nextPageToken = result.nextPageToken;
+      UTILITY_VARIABLES.latestSearchedKeyword = keyword;
     } catch (err) {
       console.log(err);
     }
@@ -99,17 +108,26 @@ export default function App() {
 
   return (
     <Router>
-      <GlobalStyle />
-      <AppHeader updateSearchingResult={(val) => setSearchingResult(val)} />
+      <AppHeader
+        fetchNewData={(keyword) => debouncedFetchingNewData_trailing(UTILITY_VARIABLES.nextPageToken, keyword)}
+      />
       <Route path="/">
         <Main>
           <Container>
-              <VideoList videoListData={searchingResult} />
+              <VideoList
+                videoListData={searchingResult} fetchNewData={() => {
+                  debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken, UTILITY_VARIABLES.latestSearchedKeyword);
+                }}
+                scrollableHeight={UTILITY_VARIABLES.scrollableHeight}
+              />
           </Container>
         </Main>
       </Route>
       <Route path="/:videoId" >
-        {renderedVideoCounter > 0 && <VideoPlayer onMount={findVideo} videoData={selectedVideo} />}
+        {
+          (renderedVideoCounter > 0) &&
+          <VideoPlayer onMount={findVideo} videoData={selectedVideo} />
+        }
       </Route>
     </Router>
   );

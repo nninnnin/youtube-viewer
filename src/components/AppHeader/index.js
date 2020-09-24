@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+
 import styled from "styled-components";
 import logo from "../../assets/logo.svg";
 import SearchInput from "../SearchInput";
 import Container from "../shared/Container";
 import Heading from "../shared/Heading";
-import { searchYoutube } from '../../api/youtube';
+import { searchYoutube } from "../../api/youtube";
 
 const Header = styled.header`
+  @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
   position: fixed;
   background-color: #ffffff;
   width: 100%;
@@ -28,53 +31,40 @@ const Header = styled.header`
 
     h1 {
       margin-left: 10px;
-      text-transform: uppercase;
+      font-family: 'Poppins', sans-serif;
     }
   }
 
   img {
     height: 30px;
   }
-
-  .input-container {
-    width: 300px;
-    display: flex;
-    white-space: nowrap;
-  }
 `;
 
-export default function AppHeader({ updateSearchingResult }) {
-  const [searchInput, setSearchInput] = useState('');
-
-  async function handleSearchButtonClick () {
-    console.log(searchInput);
-    const searchKeys = {
-      q: searchInput,
-      maxResults: 10,
-      type: "video"
-    };
-    const result = await searchYoutube(searchKeys);
-    console.log(result);
-    updateSearchingResult(result.items);
-  }
+export default function AppHeader({ fetchNewData, updateKeyword }) {
+  const [ keyword, setKeyword ] = useState('');
 
   return (
     <Header>
       <Container>
         <section>
           <div className="brand">
-            <img src={logo} alt="logo" />
-            <Heading>VANILLA TUBE</Heading>
+            <img src={logo}
+                alt="logo"
+                style={{ position: 'relative', bottom: '3px' }}
+            />
+            <Heading href="/">Vanillatube</Heading>
           </div>
           <div className="input-container">
             <SearchInput
               placeholder="Youtube 검색"
-              value={searchInput}
+              value={keyword}
               onChange={(val) => {
-                setSearchInput(val);
+                setKeyword(val);
+                if (val !== '') {
+                  fetchNewData(val);
+                }
               }}
             />
-            <button onClick={handleSearchButtonClick}>찾기</button>
           </div>
         </section>
       </Container>

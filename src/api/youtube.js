@@ -4,8 +4,6 @@ import mockAPI from '../assets/mockAPI.json'; // 웹팩에서 파싱되어 날�
 function mapObjectToQueryStrings(obj) {
   let result = "";
 
-  console.log(obj);
-
   for (let prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       result += `&${prop}=${obj[prop]}`;

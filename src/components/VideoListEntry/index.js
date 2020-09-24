@@ -7,7 +7,7 @@ const EntryWrapper = styled.div`
 
   font-size: 0.5em;
   width: 100%;
-  height: auto;
+  height: 270px;
   display: flex;
   flex-direction: column;
   transition: 0.2s;
@@ -16,24 +16,13 @@ const EntryWrapper = styled.div`
   box-shadow: 1px 1px 4px black;
   border-radius: 15px;
 
-  img {
-    width: 100%;
-    border-radius: 10px;
-    margin-bottom: 10px;
-
-    cursor: pointer;
-  }
-
-  .contents {
-    flex-grow: 1;
-  }
-
   .title {
     font-size: 1.7em;
   }
 
   .publishTime {
-    font-weight: bold;
+    align-self: flex-end;
+    margin-top: auto;
   }
 
   :hover{
@@ -41,17 +30,25 @@ const EntryWrapper = styled.div`
   }
 `;
 
+const Thumbnail = styled.div`
+  img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 10px;
+
+    cursor: pointer;
+  }
+`;
+
 export default function VideoListEntry({ videoData }) {
   return (
     <EntryWrapper>
-      <div>
+      <Thumbnail>
         <Link to={`/${videoData.id.videoId}`}><img src={videoData.snippet.thumbnails.high.url}/></Link>
-      </div>
-      <div className="contents">
-        <div className="title">{videoData.snippet.title}</div>
-        <div>{videoData.snippet.description.slice(0,30) + '...'}</div>
-        <div className="publishTime">published at {videoData.snippet.publishTime}</div>
-      </div>
+      </Thumbnail>
+      <div className="title">{videoData.snippet.title}</div>
+      <div>{videoData.snippet.description.slice(0,30) + '...'}</div>
+      <div className="publishTime">published at {videoData.snippet.publishTime}</div>
     </EntryWrapper>
   );
 }
