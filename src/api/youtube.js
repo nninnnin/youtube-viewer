@@ -14,33 +14,17 @@ function mapObjectToQueryStrings(obj) {
 }
 
 export const searchYoutube = async (options) => {
-  // const YOUTUBE_URL = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&part=snippet${mapObjectToQueryStrings(
-  //   options
-  // )}`;
-  // console.log(YOUTUBE_URL);
+  const YOUTUBE_URL = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&part=snippet${mapObjectToQueryStrings(
+    options
+  )}`;
 
   try {
-    // const res = await fetch(YOUTUBE_URL, {
-    //     headers: new Headers({'content-type': 'application/json'})
-    // });
-    // console.log(res);
-    // const data = await res.json();
-    // console.log(data);
-
-    // return data;
-
-    let result;
-    if (options.maxResults) {
-      const temp = mockAPI;
-      temp.items = temp.items.slice(0, options.maxResults);
-      result = temp;
-    }
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(result);
-      }, 1000);
+    const res = await fetch(YOUTUBE_URL, {
+        headers: new Headers({'content-type': 'application/json'})
     });
+    const data = await res.json();
+
+    return data;
   } catch (err) {
     console.error(err);
   }

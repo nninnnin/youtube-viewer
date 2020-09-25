@@ -21,7 +21,7 @@ export default function VideoList({ videoListData, fetchNewData }) {
   return (
     <Wrapper className="video-list-wrapper">
       {videoList}
-      { videoList.length >= 10 &&
+      { (videoList.length >= 10 && videoList.length < 20) &&
         <MoreVideos fetchNewData={fetchNewData} />
       }
     </Wrapper>

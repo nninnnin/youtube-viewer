@@ -14,12 +14,12 @@ import { searchYoutube } from '../../api/youtube';
 
 const UTILITY_VARIABLES = {
   nextPageToken: '',
-  scrollableHeight: -Infinity,
   latestSearchedKeyword: ''
 };
 
 const Main = styled.main`
   margin: 110px 0;
+  min-height: 100vh;
 `;
 
 export default function App() {
@@ -36,7 +36,6 @@ export default function App() {
 
     if (renderedVideoCounter !== renderedVideo.length) {
       setRenderedVideoCounter(renderedVideo.length);
-      console.log(renderedVideo.length + '개의 비디오가 렌더링 되었습니다');
     }
   });
 
@@ -58,24 +57,19 @@ export default function App() {
     const currentPosition = window.scrollY;
 
     const main = document.getElementsByTagName('main')[0];
-
     let mainElementMargin = 0;
     mainElementMargin += parseInt(window.getComputedStyle(main).getPropertyValue('margin-top'));
     mainElementMargin += parseInt(window.getComputedStyle(main).getPropertyValue('margin-bottom'));
 
-    const viewerHeight = window.innerHeight;
-    const finiteLine = main.offsetHeight + mainElementMargin - viewerHeight - 50;
+    const finiteLine = main.offsetHeight + mainElementMargin - window.innerHeight - 10;
 
-    console.log(currentPosition, finiteLine);
-
-    return Boolean(finiteLine - currentPosition <= 0);
+    return Boolean(finiteLine <= currentPosition);
   }
 
   const debouncedFetchingNewData = _.debounce(fetchingNewData, 2000, {'leading': true, 'trailing': false});
   const debouncedFetchingNewData_trailing = _.debounce(fetchingNewData, 2000, {'leading': false, 'trailing': true});
 
   async function fetchingNewData(nextPageToken, keyword='') {
-    console.log('펫칭');
     try {
       const result = await searchYoutube({
         q: keyword,
@@ -85,6 +79,7 @@ export default function App() {
       });
 
       if (keyword !== UTILITY_VARIABLES.latestSearchedKeyword) {
+        window.scrollTo(0, 0);
         setSearchingResult(result.items);
       } else {
         setSearchingResult(searchingResult.concat(result.items));
@@ -115,10 +110,10 @@ export default function App() {
         <Main>
           <Container>
               <VideoList
-                videoListData={searchingResult} fetchNewData={() => {
+                videoListData={searchingResult}
+                fetchNewData={() => {
                   debouncedFetchingNewData(UTILITY_VARIABLES.nextPageToken, UTILITY_VARIABLES.latestSearchedKeyword);
                 }}
-                scrollableHeight={UTILITY_VARIABLES.scrollableHeight}
               />
           </Container>
         </Main>

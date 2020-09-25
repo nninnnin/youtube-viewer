@@ -5,7 +5,6 @@ import logo from "../../assets/logo.svg";
 import SearchInput from "../SearchInput";
 import Container from "../shared/Container";
 import Heading from "../shared/Heading";
-import { searchYoutube } from "../../api/youtube";
 
 const Header = styled.header`
   @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
@@ -40,7 +39,7 @@ const Header = styled.header`
   }
 `;
 
-export default function AppHeader({ fetchNewData, updateKeyword }) {
+export default function AppHeader({ fetchNewData }) {
   const [ keyword, setKeyword ] = useState('');
 
   return (
