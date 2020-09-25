@@ -1,5 +1,4 @@
 import { YOUTUBE_API_KEY } from "../config/youtube";
-import mockAPI from '../assets/mockAPI.json'; // 웹팩에서 파싱되어 날아온다!!
 
 function mapObjectToQueryStrings(obj) {
   let result = "";
@@ -26,6 +25,6 @@ export const searchYoutube = async (options) => {
 
     return data;
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
