@@ -6,11 +6,11 @@ import Modal from '../shared/Modal'
 const Video = styled.iframe`
   padding: 15px;
   background-color: black;
-`
+`;
 const VideoInfo = styled.div`
   margin-left: 15px;
   overflow-x: auto;
-`
+`;
 const Title = styled.h1`
   font-size: 1.5em;
 `;

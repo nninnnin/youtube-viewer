@@ -8,7 +8,7 @@ import {
 import AppHeader from "../AppHeader";
 import VideoList from "../VideoList";
 import VideoPlayer from "../VideoPlayer";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Container from "../shared/Container";
 import { searchYoutube } from '../../api/youtube';
 
@@ -99,7 +99,7 @@ export default function App() {
         break;
       }
     }
-  }
+  };
 
   return (
     <Router>
