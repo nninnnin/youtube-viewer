@@ -95,11 +95,13 @@ export default function App() {
   const findVideo = (videoId) => {
     for (let i = 0; i < searchingResult.length; i++) {
       if (searchingResult[i].id.videoId === videoId) {
-        console.log(searchingResult[i]);
-        return searchingResult[i]; // 그냥 리턴?
+        console.log('찾앗습니다');
+        return searchingResult[i];
       }
     }
   };
+
+  console.log(searchingResult);
 
   return (
     <Router>

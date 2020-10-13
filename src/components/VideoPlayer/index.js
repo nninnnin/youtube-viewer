@@ -22,17 +22,21 @@ const Description = styled.p`
 export default function VideoPlayer ({ onMount }) {
   let videoData;
   const { videoId } = useParams();
+  const [ selectedVideo, setSelectedVideo ] = useState({});
 
   useEffect(() => {
     videoData = onMount(videoId);
+    setSelectedVideo(videoData);
   }, []);
+
+  console.log(selectedVideo);
 
   return (
     <Modal>
-      <Video src={`https://www.youtube.com/embed/${videoData.id?.videoId}`}></Video>
+      <Video src={`https://www.youtube.com/embed/${selectedVideo.id?.videoId}`}></Video>
       <VideoInfo>
-        <Title>{videoData.snippet?.title}</Title>
-        <Description>{videoData.snippet?.description}</Description>
+        <Title>{selectedVideo.snippet?.title}</Title>
+        <Description>{selectedVideo.snippet?.description}</Description>
       </VideoInfo>
     </Modal>
   );

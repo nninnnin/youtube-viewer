@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 
 export default function VideoList({ videoListData, fetchNewData }) {
   const videoList = videoListData.map((video) => {
-    return <VideoListEntry videoData={video} /> // key={video.etag}
+    return <VideoListEntry videoData={video} key={video.etag} />
   });
 
   return (
