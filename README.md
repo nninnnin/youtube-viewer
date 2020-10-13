@@ -6,4 +6,7 @@
 - React router를 사용하여 동영상 상세뷰어를 Modal로 구현
 
 ![](public/usher.png)
+<p style="text-align:center">어셔를 검색했을 때의 화면</p>
+
 ![](public/player.png)
+<p style="text-align:center">비디오를 클릭했을 때</p>
