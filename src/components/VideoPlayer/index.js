@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
 import Modal from '../shared/Modal'
 
 const Video = styled.iframe`
@@ -27,7 +27,6 @@ export default function VideoPlayer ({ onMount }) {
     videoData = onMount(videoId);
   }, []);
 
-  console.log(videoData);
   return (
     <Modal>
       <Video src={`https://www.youtube.com/embed/${videoData.id?.videoId}`}></Video>
