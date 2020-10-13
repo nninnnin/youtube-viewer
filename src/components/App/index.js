@@ -95,8 +95,8 @@ export default function App() {
   const findVideo = (videoId) => {
     for (let i = 0; i < searchingResult.length; i++) {
       if (searchingResult[i].id.videoId === videoId) {
-        setSelectedVideo(searchingResult[i]);
-        break;
+        console.log(searchingResult[i]);
+        return searchingResult[i]; // 그냥 리턴?
       }
     }
   };

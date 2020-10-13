@@ -19,13 +19,15 @@ const Description = styled.p`
   font-size: 0.8em;
 `;
 
-export default function VideoPlayer ({ onMount, videoData }) {
+export default function VideoPlayer ({ onMount }) {
+  let videoData;
   const { videoId } = useParams();
 
   useEffect(() => {
-    onMount(videoId);
+    videoData = onMount(videoId);
   }, []);
 
+  console.log(videoData);
   return (
     <Modal>
       <Video src={`https://www.youtube.com/embed/${videoData.id?.videoId}`}></Video>
